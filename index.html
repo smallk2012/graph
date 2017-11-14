@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>交互流程图 by cC</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta content="" name="keywords">
+		<meta content="" name="description">
+		<link rel="SHORTCUT ICON" href="img/favicon.ico" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/showBo.css" />
+		<link rel="stylesheet" type="text/css" href="css/app.css" />
+	</head>
+
+	<body>
+		<div id="app" v-cloak>
+			<div class="drag hide">
+				<img src="img/uoload.png" />
+				<h2>拖拽目录或json.txt</h2>
+			</div>
+			<div class="container main">
+				
+				<div class="list-group clearfix">
+					<div class="list-item">
+						<div class="title">
+							<h2>目录</h2>
+							<input type="text" value="" v-model="pageKey" @keyup.enter="onEnter(pageKey)" placeholder="输入自定义页面名,回车"/>
+						</div>
+						<ul class="catalog" id="droparea">
+							<li v-for="(item,index) in pages" @click="selCatalog(item,index)" :key="index" :class="{'active' : cIndex == index}">
+								{{item}}
+							</li>
+						</ul>
+						<a class="btn-clear" :class="{'active' : links.length > 0}" @click="delLinks()">清空</a>
+					</div>
+					<div class="list-item">
+						<h2>关联</h2>
+						<ul class="link">
+							<li v-for="(item,index) in links">
+								{{item.page}}<input type="text" value="" v-model="item.label"/><i @click="delLink(index)">删除</i>
+							</li>
+						</ul>
+					</div>
+					<div class="list-item">
+						<div class="title">
+							<h2>备选</h2>
+							<input type="text" value="" v-model="searchKey"/>
+						</div>
+						<ul class="option">
+							<li v-for="(item,index) in options">
+								{{item.page}}<i @click="delOption(index)">添加</i>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="request">
+					<div class="container">
+						<div class="http-warp">
+							<div class="http">
+								<div class="http-in">
+									<label>接口：</label>
+									<input type="text" value="" v-model="ahttp" placeholder="请输入接口连接...[本页面数据只存本地，不会上传服务器,放心使用!]"/>
+									<a @click="addReq(ahttp)">添加</a>
+								</div>
+								<ul>
+									<li v-for="(item,index) in requests">
+										{{item}}<i @click="delRequest(index)">删除</i>
+									</li>
+								</ul>
+								<ul>
+									<li v-for="(item,index) in https">
+										{{item}}<i @click="addReq(item)" :class="{'hide': cIndex == -1}">添加</i>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="download">
+					<a class="download" @click="graph()">生成交互图</a>
+					<a id="download" class="download" :class="{'hide' : isok == false}" @click="sava()">保存交互数据</a>
+				</div>
+
+				<iframe id="scene" marginwidth="0" marginheight="0" width="100%" height="100%" frameborder="0" scrolling="no" allowFullScreen="true"></iframe>
+			</div>
+		</div>
+		
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/Pinyin.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/showBo.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>项目交互流程图</title>
+
+<link rel="stylesheet" href="demo.css">
+<script src="js/d3.v3.min.js" charset="utf-8"></script>
+<script src="js/dagre-d3.js"></script>
+
+<link rel="stylesheet" href="tipsy.css">
+<script src="lib/jquery-1.9.1.min.js"></script>
+<script src="tipsy.js"></script>
+
+<style id="css">
+	text {
+		font-weight: 300;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+		font-size: 14px;
+	}
+	
+	.node rect {
+		stroke: #333;
+		fill: #fff;
+	}
+	
+	.edgePath path {
+		stroke: #333;
+		fill: #333;
+		stroke-width: 1.5px;
+	}
+	
+	.node text {
+		pointer-events: none;
+	}
+	/* This styles the title of the tooltip */
+	
+	.tipsy .name {
+		font-size: 1.5em;
+		font-weight: bold;
+		color: #60b1fc;
+		margin: 0;
+	}
+	/* This styles the body of the tooltip */
+	
+	.tipsy .description {
+		font-size: 1.2em;
+	}
+</style>
+
+<svg width=960 height=600></svg>
+<p id="tip" style="position: absolute;top: 0;left: 80px;margin: 0;font-size: 14px;font-weight: bold;"></p>
+
+<script id="js">
+	var wData = [];
+	$(document).ready(function() {
+		if(parent != null && parent.wData) {
+			wData = parent.wData;
+			init();
+		}
+	});
+
+	function init() {
+		//1.inner.selectAll('*').remove() //清除掉内容
+		//2.render(inner,g)//绘制
+
+		// Create a new directed graph
+		var g = new dagreD3.graphlib.Graph().setGraph({});
+
+		// States and transitions from RFC 793
+		var states = {
+			CLOSED: {
+				description: "represents no connection state at all.",
+				style: "fill: #f77"
+			}
+		};
+		var pCount = 0;
+		var aCount = 0;
+		Object.keys(wData).forEach(function(index) {
+			pCount++;
+			var state = wData[index].page;
+
+			var obj = {};
+			obj.label = state
+			obj.rx = obj.ry = 5;
+			
+			var description = "";
+			var req = wData[index].requests;
+			for(var n = 0; n < req.length; n++) {
+				description += req[n] + '\n';
+			}
+			obj.description = description || "暂无";
+			g.setNode(state, obj);
+			var links = wData[index].links;
+			for(var m = 0; m < links.length; m++) {
+				aCount++;
+				g.setEdge(state, links[m].page, {
+					label: links[m].label || ""
+				});
+			}
+
+		});
+		$('#tip').html("共" + pCount + "页面," + aCount + "个交互")
+		// Add states to the graph, set labels, and style
+		/*Object.keys(states).forEach(function(state) {
+			var value = states[state];
+			value.label = state;
+			value.rx = value.ry = 5;
+			g.setNode(state, {});
+		});*/
+
+		// Set up the edges
+		/*g.setEdge("CLOSED", "LISTEN", {
+			label: "open"
+		});
+		g.setEdge("LISTEN", "SYN RCVD", {
+			label: "rcv SYN"
+		});*/
+
+		// Create the renderer
+		var render = new dagreD3.render();
+
+		// Set up an SVG group so that we can translate the final graph.
+		var svg = d3.select("svg"),
+			inner = svg.append("g");
+
+		// Set up zoom support
+		var zoom = d3.behavior.zoom().on("zoom", function() {
+			inner.attr("transform", "translate(" + d3.event.translate + ")" +
+				"scale(" + d3.event.scale + ")");
+		});
+		//控制缩放
+		//svg.call(zoom);
+
+		// Simple function to style the tooltip for the given node.
+		var styleTooltip = function(name, description) {
+			return "<p class='name'>接口</p><p class='description'>" + description + "</p>";
+		};
+
+		// Run the renderer. This is what draws the final graph.
+		render(inner, g);
+
+		inner.selectAll("g.node")
+			.attr("title", function(v) {
+				return styleTooltip(v, g.node(v).description)
+			})
+			.each(function(v) {
+				$(this).tipsy({
+					gravity: "w",
+					opacity: 1,
+					html: true
+				});
+			});
+
+		// Center the graph
+		var initialScale = 0.75;
+		zoom
+			.translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+			.scale(initialScale)
+			.event(svg);
+		svg.attr('height', g.graph().height * initialScale + 40);
+		parent != null && parent.setIframe && parent.setIframe($('svg').height() + 2);
+	}
+</script>
+<!--
+	作者：oC_Co@qq.com
+	时间：2017-11-06
+	描述：
+	<script src="demo.js"></script>
+-->
