@@ -47,12 +47,14 @@
 	}
 </style>
 
-<svg width=960 height=600></svg>
-<p id="tip" style="position: absolute;top: 0;left: 80px;margin: 0;font-size: 14px;font-weight: bold;"></p>
-
+<svg width="960" height="600"></svg>
+<p id="tip" style="position: absolute;top: 0;left: 120px;margin: 0;font-size: 14px;font-weight: bold;"></p>
+<label style="position: absolute;top: 0;left: 10px;font-size: 14px;font-weight: bold;"><input type="checkbox" name="" id="btnscale" value="" />缩放流程图</label>
 <script id="js">
 	var wData = [];
 	$(document).ready(function() {
+		$("svg").attr("width",($(document).width()-2));
+		
 		if(parent != null && parent.wData) {
 			wData = parent.wData;
 			init();
@@ -125,11 +127,13 @@
 
 		// Set up zoom support
 		var zoom = d3.behavior.zoom().on("zoom", function() {
-			inner.attr("transform", "translate(" + d3.event.translate + ")" +
+			if($('#btnscale').get(0).checked){
+				inner.attr("transform", "translate(" + d3.event.translate + ")" +
 				"scale(" + d3.event.scale + ")");
+			}
 		});
 		//控制缩放
-		//svg.call(zoom);
+		svg.call(zoom);
 
 		// Simple function to style the tooltip for the given node.
 		var styleTooltip = function(name, description) {
@@ -158,6 +162,7 @@
 			.scale(initialScale)
 			.event(svg);
 		svg.attr('height', g.graph().height * initialScale + 40);
+		inner.attr("transform", "translate(" + ((svg.attr("width") - g.graph().width * initialScale) / 2) + ",20)" +"scale(" + initialScale + ")");
 		parent != null && parent.setIframe && parent.setIframe($('svg').height() + 2);
 	}
 </script>

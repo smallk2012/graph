@@ -1,6 +1,9 @@
 [v-cloak] {
   display: none;
 }
+body {
+  background-color: #fff;
+}
 .drag {
   display: block;
   width: 380px;
@@ -243,13 +246,13 @@
 .main .request .container .http-warp .http ul li:hover i {
   display: block;
 }
-.main .download {
-  text-align: center;
-  margin-bottom: 20px;
+.graph {
+  width: 100%;
+  background-color: #fff;
 }
-.main .download a {
-  display: inline-block;
-  margin: 20px auto 0 auto;
+.graph .download {
+  display: block;
+  margin: 20px auto;
   width: 120px;
   height: 40px;
   line-height: 40px;
